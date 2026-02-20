@@ -1,3 +1,0 @@
-# QuantityMeasurementApp
-
-Hello Dev
