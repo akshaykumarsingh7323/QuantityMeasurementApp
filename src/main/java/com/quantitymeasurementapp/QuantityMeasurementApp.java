@@ -6,26 +6,34 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
 
-        try {
-            System.out.print("Enter first value in feet: ");
-            double value1 = Double.parseDouble(scanner.nextLine());
+        // Feet Equality 
+        System.out.println("Enter first no. (feet): ");
+        Feet firstFeet = new Feet(input.nextDouble());
 
-            System.out.print("Enter second value in feet: ");
-            double value2 = Double.parseDouble(scanner.nextLine());
+        System.out.println("Enter second no. (feet): ");
+        Feet secondFeet = new Feet(input.nextDouble());
 
-            Feet feet1 = new Feet(value1);
-            Feet feet2 = new Feet(value2);
+        boolean feetResult = firstFeet.equals(secondFeet);
 
-            boolean result = feet1.equals(feet2);
+        System.out.println("Input: " + firstFeet + " and " + secondFeet);
+        System.out.println("Output: Equal (" + feetResult + ")");
 
-            System.out.println("Equal: " + result);
+        System.out.println("----------------------------------");
 
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input! Please enter numeric values.");
-        }
+        // Inches Equality
+        System.out.println("Enter first no. (inch): ");
+        Inches firstInch = new Inches(input.nextDouble());
 
-        scanner.close();
+        System.out.println("Enter second no. (inch): ");
+        Inches secondInch = new Inches(input.nextDouble());
+
+        boolean inchResult = firstInch.equals(secondInch);
+
+        System.out.println("Input: " + firstInch + " and " + secondInch);
+        System.out.println("Output: Equal (" + inchResult + ")");
+
+        input.close();
     }
 }
