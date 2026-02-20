@@ -6,34 +6,28 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        Scanner input = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-        // Feet Equality 
-        System.out.println("Enter first no. (feet): ");
-        Feet firstFeet = new Feet(input.nextDouble());
+        System.out.println("Enter first value: ");
+        double value1 = sc.nextDouble();
 
-        System.out.println("Enter second no. (feet): ");
-        Feet secondFeet = new Feet(input.nextDouble());
+        System.out.println("Enter first unit (FEET/INCH): ");
+        LengthUnit unit1 = LengthUnit.valueOf(sc.next().toUpperCase());
 
-        boolean feetResult = firstFeet.equals(secondFeet);
+        System.out.println("Enter second value: ");
+        double value2 = sc.nextDouble();
 
-        System.out.println("Input: " + firstFeet + " and " + secondFeet);
-        System.out.println("Output: Equal (" + feetResult + ")");
+        System.out.println("Enter second unit (FEET/INCH): ");
+        LengthUnit unit2 = LengthUnit.valueOf(sc.next().toUpperCase());
 
-        System.out.println("----------------------------------");
+        QuantityLength q1 = new QuantityLength(value1, unit1);
+        QuantityLength q2 = new QuantityLength(value2, unit2);
 
-        // Inches Equality
-        System.out.println("Enter first no. (inch): ");
-        Inches firstInch = new Inches(input.nextDouble());
+        boolean result = q1.equals(q2);
 
-        System.out.println("Enter second no. (inch): ");
-        Inches secondInch = new Inches(input.nextDouble());
+        System.out.println("Input: " + q1 + " and " + q2);
+        System.out.println("Output: Equal (" + result + ")");
 
-        boolean inchResult = firstInch.equals(secondInch);
-
-        System.out.println("Input: " + firstInch + " and " + secondInch);
-        System.out.println("Output: Equal (" + inchResult + ")");
-
-        input.close();
+        sc.close();
     }
 }
