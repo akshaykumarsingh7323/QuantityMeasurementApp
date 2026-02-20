@@ -17,7 +17,7 @@ public class QuantityMeasurementApp {
 
         boolean feetResult = firstFeet.equals(secondFeet);
 
-        System.out.println("Input: " + firstFeet + " and " + secondFeet);
+        System.out.println("Input: " + firstFeet.getValue() + " and " + secondFeet.getValue());
         System.out.println("Output: Equal (" + feetResult + ")");
 
         System.out.println("----------------------------------");
