@@ -1,39 +1,42 @@
 package com.quantitymeasurementapp;
 
+import java.util.Objects;
+
 public class Feet {
 
-    private final double value;
+	private final double value;
 
-    public Feet(double value) {
-        this.value = value;
-    }
+	public Feet(double value) {
+		this.value = value;
+	}
 
-    public double getValue() {
-        return value;
-    }
+	public double getValue() {
+		return value;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
+	@Override
+	public boolean equals(Object obj) {
 
-        if (this == obj) {
-            return true;
-        }
+		if (this == obj) {
+			return true;
+		}
 
-        if (obj == null) {
-            return false;
-        }
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+		Feet other = (Feet) obj;
 
-        Feet other = (Feet) obj;
+		return Double.compare(this.value, other.value) == 0;
+	}
 
-        return Double.compare(this.value, other.value) == 0;
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
 
-    @Override
-    public int hashCode() {
-        return Double.hashCode(value);
-    }
+	@Override
+	public String toString() {
+		return value + " ft";
+	}
 }
