@@ -10,31 +10,95 @@ public class QuantityMeasurementApp {
 
         try {
 
-            System.out.println("Enter first value:");
-            double value1 = scanner.nextDouble();
+            System.out.println("Choose Operation:");
+            System.out.println("1 - Convert");
+            System.out.println("2 - Add (Implicit Target)");
+            System.out.println("3 - Add (Explicit Target)");
+            System.out.print("Enter choice: ");
 
-            System.out.println("Enter first unit (FEET, INCHES, YARDS, CENTIMETERS):");
-            LengthUnit unit1 = LengthUnit.valueOf(scanner.next().toUpperCase());
+            int choice = scanner.nextInt();
 
-            System.out.println("Enter second value:");
-            double value2 = scanner.nextDouble();
+            if (choice == 1) {
 
-            System.out.println("Enter second unit (FEET, INCHES, YARDS, CENTIMETERS):");
-            LengthUnit unit2 = LengthUnit.valueOf(scanner.next().toUpperCase());
+                System.out.print("Enter value: ");
+                double value = scanner.nextDouble();
 
-            System.out.println("Enter target unit (FEET, INCHES, YARDS, CENTIMETERS):");
-            LengthUnit targetUnit = LengthUnit.valueOf(scanner.next().toUpperCase());
+                System.out.print("Enter unit (FEET, INCHES, YARDS, CENTIMETERS): ");
+                LengthUnit unit =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
 
-            QuantityLength q1 = new QuantityLength(value1, unit1);
-            QuantityLength q2 = new QuantityLength(value2, unit2);
+                System.out.print("Enter target unit: ");
+                LengthUnit targetUnit =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
 
-            QuantityLength result =
-                    QuantityLength.add(q1, q2, targetUnit);
+                QuantityLength quantity =
+                        new QuantityLength(value, unit);
 
-            System.out.println("Result: " + result);
+                QuantityLength result =
+                        quantity.convertTo(targetUnit);
+
+                System.out.println("Result: " + result);
+            }
+
+            else if (choice == 2) {
+
+                System.out.print("Enter first value: ");
+                double v1 = scanner.nextDouble();
+
+                System.out.print("Enter first unit: ");
+                LengthUnit u1 =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
+
+                System.out.print("Enter second value: ");
+                double v2 = scanner.nextDouble();
+
+                System.out.print("Enter second unit: ");
+                LengthUnit u2 =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
+
+                QuantityLength q1 = new QuantityLength(v1, u1);
+                QuantityLength q2 = new QuantityLength(v2, u2);
+
+                QuantityLength result = q1.add(q2);
+
+                System.out.println("Result: " + result);
+            }
+
+            else if (choice == 3) {
+
+                System.out.print("Enter first value: ");
+                double v1 = scanner.nextDouble();
+
+                System.out.print("Enter first unit: ");
+                LengthUnit u1 =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
+
+                System.out.print("Enter second value: ");
+                double v2 = scanner.nextDouble();
+
+                System.out.print("Enter second unit: ");
+                LengthUnit u2 =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
+
+                System.out.print("Enter target unit: ");
+                LengthUnit targetUnit =
+                        LengthUnit.valueOf(scanner.next().toUpperCase());
+
+                QuantityLength q1 = new QuantityLength(v1, u1);
+                QuantityLength q2 = new QuantityLength(v2, u2);
+
+                QuantityLength result =
+                        q1.add(q2, targetUnit);
+
+                System.out.println("Result: " + result);
+            }
+
+            else {
+                System.out.println("Invalid choice!");
+            }
 
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error: Invalid input - " + e.getMessage());
         }
 
         scanner.close();

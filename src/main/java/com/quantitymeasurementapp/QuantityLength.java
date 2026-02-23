@@ -27,28 +27,35 @@ public final class QuantityLength {
         return unit;
     }
 
-    // UC6: implicit target unit (first operand unit)
-    public QuantityLength add(QuantityLength other) {
-        return add(this, other, this.unit);
-    }
-
-    // UC7: explicit target unit
-    public static QuantityLength add(QuantityLength a,
-                                     QuantityLength b,
-                                     LengthUnit targetUnit) {
-
-        if (a == null || b == null)
-            throw new IllegalArgumentException("Operands cannot be null");
+    public QuantityLength convertTo(LengthUnit targetUnit) {
 
         if (targetUnit == null)
             throw new IllegalArgumentException("Target unit cannot be null");
 
-        double aFeet = a.unit.toFeet(a.value);
-        double bFeet = b.unit.toFeet(b.value);
+        double baseValue = unit.convertToBaseUnit(this.value);
+        double converted = targetUnit.convertFromBaseUnit(baseValue);
 
-        double sumFeet = aFeet + bFeet;
+        return new QuantityLength(converted, targetUnit);
+    }
 
-        double result = targetUnit.fromFeet(sumFeet);
+    public QuantityLength add(QuantityLength other) {
+        return add(other, this.unit);
+    }
+
+    public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
+
+        if (other == null)
+            throw new IllegalArgumentException("Other quantity cannot be null");
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double sumBase = base1 + base2;
+
+        double result = targetUnit.convertFromBaseUnit(sumBase);
 
         return new QuantityLength(result, targetUnit);
     }
@@ -61,15 +68,15 @@ public final class QuantityLength {
 
         QuantityLength other = (QuantityLength) obj;
 
-        double thisFeet = this.unit.toFeet(this.value);
-        double otherFeet = other.unit.toFeet(other.value);
+        double thisBase = unit.convertToBaseUnit(this.value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
 
-        return Math.abs(thisFeet - otherFeet) < EPSILON;
+        return Math.abs(thisBase - otherBase) < EPSILON;
     }
 
     @Override
     public int hashCode() {
-        return 1;   // acceptable since equals uses epsilon
+        return 1;
     }
 
     @Override
