@@ -5,37 +5,42 @@ import java.util.Scanner;
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Enter first value(Yards): ");
-        double value1 = input.nextDouble();
 
-        System.out.println("Enter second value(Feet): ");
-        double value2 = input.nextDouble();
-        
-        QuantityLength q1 =
-                new QuantityLength(value1, LengthUnit.YARDS);
+        Scanner scanner = new Scanner(System.in);
 
-        QuantityLength q2 =
-                new QuantityLength(value2, LengthUnit.FEET);
+        System.out.println("===== UC5 Length Conversion =====\n");
 
-        System.out.println("Input: " + q1 + " and " + q2);
-        System.out.println("Output: Equal (" + q1.equals(q2) + ")");
+        try {
 
-        System.out.println();
-        
-        System.out.println("Enter first value(CM): ");
-        double value3 = input.nextDouble();
-        System.out.println("Enter first value(INCH): ");
-        double value4 = input.nextDouble();
-        
-        QuantityLength q3 =
-                new QuantityLength(value3, LengthUnit.CENTIMETERS);
+            System.out.print("Enter value: ");
+            double value = scanner.nextDouble();
 
-        QuantityLength q4 =
-                new QuantityLength(value4, LengthUnit.INCH);
+            System.out.println("\nAvailable Units:");
+            for (LengthUnit unit : LengthUnit.values()) {
+                System.out.println("- " + unit);
+            }
 
-        System.out.println("Input: " + q3 + " and " + q4);
-        System.out.println("Output: Equal (" + q3.equals(q4) + ")");
-        input.close();
+            System.out.print("\nEnter source unit (FEET): ");
+            LengthUnit source =
+                    LengthUnit.valueOf(scanner.next().toUpperCase());
+
+            System.out.print("Enter target unit (INCHES): ");
+            LengthUnit target =
+                    LengthUnit.valueOf(scanner.next().toUpperCase());
+
+            double result =
+                    QuantityLength.convert(value, source, target);
+
+            System.out.println("\nResult:");
+            System.out.println(value + " " + source +
+                    " = " + result + " " + target);
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error: Invalid input or unit.");
+        } catch (Exception e) {
+            System.err.println("\nUnexpected error occurred.");
+        } finally {
+            scanner.close();
+        }
     }
 }
