@@ -6,101 +6,31 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-        try {
+        System.out.println("Enter first value:");
+        double value1 = sc.nextDouble();
 
-            System.out.println("Choose Operation:");
-            System.out.println("1 - Convert");
-            System.out.println("2 - Add (Implicit Target)");
-            System.out.println("3 - Add (Explicit Target)");
-            System.out.print("Enter choice: ");
+        System.out.println("Enter first unit (KILOGRAM / GRAM / POUND):");
+        WeightUnit unit1 = WeightUnit.valueOf(sc.next().toUpperCase());
 
-            int choice = scanner.nextInt();
+        System.out.println("Enter second value:");
+        double value2 = sc.nextDouble();
 
-            if (choice == 1) {
+        System.out.println("Enter second unit (KILOGRAM / GRAM / POUND):");
+        WeightUnit unit2 = WeightUnit.valueOf(sc.next().toUpperCase());
 
-                System.out.print("Enter value: ");
-                double value = scanner.nextDouble();
+        QuantityWeight w1 = new QuantityWeight(value1, unit1);
+        QuantityWeight w2 = new QuantityWeight(value2, unit2);
 
-                System.out.print("Enter unit (FEET, INCHES, YARDS, CENTIMETERS): ");
-                LengthUnit unit =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
+        System.out.println("Are Equal? -> " + w1.equals(w2));
 
-                System.out.print("Enter target unit: ");
-                LengthUnit targetUnit =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
+        QuantityWeight sum = w1.add(w2);
+        System.out.println("Sum (in first unit) -> " + sum);
 
-                QuantityLength quantity =
-                        new QuantityLength(value, unit);
+        System.out.println("Convert first weight to GRAM:");
+        System.out.println(w1.convertTo(WeightUnit.GRAM));
 
-                QuantityLength result =
-                        quantity.convertTo(targetUnit);
-
-                System.out.println("Result: " + result);
-            }
-
-            else if (choice == 2) {
-
-                System.out.print("Enter first value: ");
-                double v1 = scanner.nextDouble();
-
-                System.out.print("Enter first unit: ");
-                LengthUnit u1 =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
-
-                System.out.print("Enter second value: ");
-                double v2 = scanner.nextDouble();
-
-                System.out.print("Enter second unit: ");
-                LengthUnit u2 =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
-
-                QuantityLength q1 = new QuantityLength(v1, u1);
-                QuantityLength q2 = new QuantityLength(v2, u2);
-
-                QuantityLength result = q1.add(q2);
-
-                System.out.println("Result: " + result);
-            }
-
-            else if (choice == 3) {
-
-                System.out.print("Enter first value: ");
-                double v1 = scanner.nextDouble();
-
-                System.out.print("Enter first unit: ");
-                LengthUnit u1 =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
-
-                System.out.print("Enter second value: ");
-                double v2 = scanner.nextDouble();
-
-                System.out.print("Enter second unit: ");
-                LengthUnit u2 =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
-
-                System.out.print("Enter target unit: ");
-                LengthUnit targetUnit =
-                        LengthUnit.valueOf(scanner.next().toUpperCase());
-
-                QuantityLength q1 = new QuantityLength(v1, u1);
-                QuantityLength q2 = new QuantityLength(v2, u2);
-
-                QuantityLength result =
-                        q1.add(q2, targetUnit);
-
-                System.out.println("Result: " + result);
-            }
-
-            else {
-                System.out.println("Invalid choice!");
-            }
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: Invalid input - " + e.getMessage());
-        }
-
-        scanner.close();
+        sc.close();
     }
 }
