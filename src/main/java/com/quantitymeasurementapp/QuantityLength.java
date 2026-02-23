@@ -1,15 +1,14 @@
 package com.quantitymeasurementapp;
 
-import java.util.Objects;
-
 public final class QuantityLength {
 
-    private static final double EPSILON = 0.0001;
+    private static final double EPSILON = 0.001;
 
     private final double value;
     private final LengthUnit unit;
 
     public QuantityLength(double value, LengthUnit unit) {
+
         if (unit == null)
             throw new IllegalArgumentException("Unit cannot be null");
 
@@ -28,26 +27,21 @@ public final class QuantityLength {
         return unit;
     }
 
+    // UC6: implicit target unit (first operand unit)
     public QuantityLength add(QuantityLength other) {
-        if (other == null)
-            throw new IllegalArgumentException("Second operand cannot be null");
-
-        double thisInFeet = unit.toFeet(this.value);
-        double otherInFeet = other.unit.toFeet(other.value);
-
-        double sumFeet = thisInFeet + otherInFeet;
-
-        double result = unit.fromFeet(sumFeet);
-
-        return new QuantityLength(result, this.unit);
+        return add(this, other, this.unit);
     }
 
+    // UC7: explicit target unit
     public static QuantityLength add(QuantityLength a,
                                      QuantityLength b,
                                      LengthUnit targetUnit) {
 
-        if (a == null || b == null || targetUnit == null)
-            throw new IllegalArgumentException("Invalid arguments");
+        if (a == null || b == null)
+            throw new IllegalArgumentException("Operands cannot be null");
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
 
         double aFeet = a.unit.toFeet(a.value);
         double bFeet = b.unit.toFeet(b.value);
@@ -61,11 +55,13 @@ public final class QuantityLength {
 
     @Override
     public boolean equals(Object obj) {
+
+        if (this == obj) return true;
         if (!(obj instanceof QuantityLength)) return false;
 
         QuantityLength other = (QuantityLength) obj;
 
-        double thisFeet = unit.toFeet(this.value);
+        double thisFeet = this.unit.toFeet(this.value);
         double otherFeet = other.unit.toFeet(other.value);
 
         return Math.abs(thisFeet - otherFeet) < EPSILON;
@@ -73,7 +69,7 @@ public final class QuantityLength {
 
     @Override
     public int hashCode() {
-        return Objects.hash(unit.toFeet(value));
+        return 1;   // acceptable since equals uses epsilon
     }
 
     @Override
