@@ -2,15 +2,11 @@ package com.quantitymeasurementapp;
 
 public interface IMeasurable {
 
-    double getConversionFactor();
+    double getConversionFactor(); 
 
-    default double convertToBaseUnit(double value) {
-        return value * getConversionFactor();
-    }
+    double convertToBaseUnit(double value);
 
-    default double convertFromBaseUnit(double baseValue) {
-        return baseValue / getConversionFactor();
-    }
+    double convertFromBaseUnit(double baseValue);
 
     String getUnitName();
 }

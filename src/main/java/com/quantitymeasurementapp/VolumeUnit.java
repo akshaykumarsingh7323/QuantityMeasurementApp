@@ -1,14 +1,14 @@
 package com.quantitymeasurementapp;
 
-public enum WeightUnit implements IMeasurable {
+public enum VolumeUnit implements IMeasurable {
 
-    KILOGRAM(1.0),
-    GRAM(0.001),
-    POUND(0.453592);
+    LITRE(1.0),
+    MILLILITRE(0.001),
+    GALLON(3.78541);  
 
     private final double conversionFactor;
 
-    WeightUnit(double conversionFactor) {
+    VolumeUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 
@@ -19,7 +19,7 @@ public enum WeightUnit implements IMeasurable {
 
     @Override
     public double convertToBaseUnit(double value) {
-        return value * conversionFactor;
+        return value * conversionFactor;   
     }
 
     @Override
