@@ -30,7 +30,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // generic category handler (uc12)
+    // GENERIC CATEGORY HANDLER 
 
     private static <U extends Enum<U> & IMeasurable>
     void handleCategory(Scanner scanner, Class<U> unitType) {
@@ -61,7 +61,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // operations
+    // operation
 
     private static <U extends Enum<U> & IMeasurable>
     void performConversion(Scanner scanner, Class<U> unitType) {
@@ -143,7 +143,8 @@ public class QuantityMeasurementApp {
         System.out.println("Final Output: " + result.convertTo(target));
     }
 
-    // subtraction
+    // subtractoin
+
     private static <U extends Enum<U> & IMeasurable>
     void performSubtractionImplicit(Scanner scanner, Class<U> unitType) {
 
@@ -165,7 +166,8 @@ public class QuantityMeasurementApp {
         System.out.println("Output: " + q1.subtract(q2, target));
     }
 
-    // division
+    // ================= DIVISION =================
+
     private static <U extends Enum<U> & IMeasurable>
     void performDivision(Scanner scanner, Class<U> unitType) {
 
