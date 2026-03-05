@@ -32,6 +32,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     // conversion
+
     public Quantity<U> convertTo(U targetUnit) {
 
         if (targetUnit == null) {
@@ -45,6 +46,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     // addition
+
     public Quantity<U> add(Quantity<U> other) {
 
         if (other == null) {
@@ -72,8 +74,76 @@ public class Quantity<U extends IMeasurable> {
 
         return new Quantity<>(result, targetUnit);
     }
+    
+     //  Subtracts another quantity from this quantity.
+     //  Result is returned in this quantity's unit.
+     
+    public Quantity<U> subtract(Quantity<U> other) {
+        return subtract(other, this.unit);
+    }
 
-                 // equality
+    
+     //  Subtracts another quantity from this quantity.
+     //  Result is returned in specified target unit.
+     
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+
+        validateOperand(other);
+        validateTargetUnit(targetUnit);
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double baseResult = base1 - base2;
+
+        double converted =
+                targetUnit.convertFromBaseUnit(baseResult);
+
+        return new Quantity<>(roundToTwoDecimals(converted),
+                targetUnit);
+    }
+
+    // Divides this quantity by another quantity.
+    // Returns a dimensionless scalar ratio.
+
+    public double divide(Quantity<U> other) {
+
+        validateOperand(other);
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        if (Math.abs(base2) < EPSILON) {
+            throw new ArithmeticException("Division by zero quantity");
+        }
+
+        return base1 / base2;
+    }
+
+
+    private void validateOperand(Quantity<U> other) {
+
+        if (other == null) {
+            throw new IllegalArgumentException("Operand cannot be null");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Different measurement categories");
+        }
+    }
+
+    private void validateTargetUnit(U targetUnit) {
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+    }
+
+    private double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+    // EQUALITY
+
     @Override
     public boolean equals(Object obj) {
 
@@ -92,14 +162,16 @@ public class Quantity<U extends IMeasurable> {
         return unit.convertToBaseUnit(value);
     }
 
-              // hashcode must match equals
+    // hashcode
+
     @Override
     public int hashCode() {
         long rounded = Math.round(toBaseUnit() / EPSILON);
         return Objects.hash(rounded, unit.getClass());
     }
 
-                // toString 
+    // toString method
+
     @Override
     public String toString() {
         return "Quantity(" + value + ", " + unit.getUnitName() + ")";
