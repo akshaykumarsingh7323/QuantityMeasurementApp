@@ -2,6 +2,10 @@ package com.quantitymeasurementapp;
 
 import org.junit.jupiter.api.Test;
 
+import com.quantitymeasurementapp.units.IMeasurable;
+import com.quantitymeasurementapp.units.LengthUnit;
+import com.quantitymeasurementapp.units.TemperatureUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UC14TemperatureUnitTest {
