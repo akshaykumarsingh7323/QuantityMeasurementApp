@@ -1,11 +1,15 @@
-package com.quantitymeasurementapp;
+package com.quantitymeasurementapp.controller;
 
-import com.quantitymeasurementapp.controller.QuantityMeasurementController;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
 import com.quantitymeasurementapp.service.QuantityMeasurementServiceImpl;
 
-public class QuantityMeasurementApp {
+class ControllerTest {
 
-    public static void main(String[] args) {
+    @Test
+    void shouldCreateControllerInstance() {
 
         QuantityMeasurementServiceImpl service =
                 new QuantityMeasurementServiceImpl();
@@ -13,6 +17,6 @@ public class QuantityMeasurementApp {
         QuantityMeasurementController controller =
                 new QuantityMeasurementController(service);
 
-        controller.startApplication();
+        assertNotNull(controller);
     }
 }

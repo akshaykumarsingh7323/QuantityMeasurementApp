@@ -1,15 +1,14 @@
-package com.quantitymeasurementapp;
+package com.quantitymeasurementapp.units;
 
-public enum LengthUnit implements IMeasurable {
+public enum VolumeUnit implements IMeasurable {
 
-    FEET(1.0),
-    INCHES(1.0 / 12),
-    YARDS(3.0),
-    CENTIMETERS(1.0 / 30.48);
+    LITRE(1.0),
+    MILLILITRE(0.001),   // 1 mL = 0.001 L
+    GALLON(3.78541);     // 1 gallon ≈ 3.78541 L
 
     private final double conversionFactor;
 
-    LengthUnit(double conversionFactor) {
+    VolumeUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 
