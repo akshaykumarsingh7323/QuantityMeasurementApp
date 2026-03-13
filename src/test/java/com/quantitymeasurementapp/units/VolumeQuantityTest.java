@@ -41,14 +41,14 @@ public class VolumeQuantityTest {
 
     @Test
     void testEquality_LitreToGallon() {
-        assertTrue(new Quantity<>(3.78541, VolumeUnit.LITRE)
+        assertTrue(new Quantity<>(3.78541178, VolumeUnit.LITRE)
            .equals(new Quantity<>(1.0, VolumeUnit.GALLON)));
     }
 
     @Test
     void testEquality_GallonToLitre() {
         assertTrue(new Quantity<>(1.0, VolumeUnit.GALLON)
-           .equals(new Quantity<>(3.78541, VolumeUnit.LITRE)));
+           .equals(new Quantity<>(3.78541178, VolumeUnit.LITRE)));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class VolumeQuantityTest {
     void testConversion_GallonToLitre() {
         Quantity<VolumeUnit> result = new Quantity<>(1.0, VolumeUnit.GALLON).convertTo(VolumeUnit.LITRE);
 
-        assertEquals(3.78541, result.getValue(), EPS);
+        assertEquals(3.78541178, result.getValue(), EPS);
     }
 
     @Test

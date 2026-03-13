@@ -69,7 +69,7 @@ public final class Quantity<U extends IMeasurable> {
         double base = unit.convertToBaseUnit(value);
         double converted = targetUnit.convertFromBaseUnit(base);
 
-        return new Quantity<>(round(converted), targetUnit);
+        return new Quantity<>(converted, targetUnit);
     }
 
     // ================= ARITHMETIC =================
