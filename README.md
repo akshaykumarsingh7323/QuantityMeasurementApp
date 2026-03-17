@@ -667,3 +667,101 @@ Refactor `IMeasurable` to support **optional arithmetic operations** using defau
 👉 [UC14 – Temperature Measurement](https://github.com/akshaykumarsingh7323/QuantityMeasurementApp/tree/feature/UC14-TemperaturE-Measurement)
 
 ---
+
+## 🏗️ UC15 – N-Tier Architecture Refactoring
+
+## Description
+
+UC15 refactors the Quantity Measurement Application from a monolithic design into a **professional N-Tier architecture**.  
+The system is divided into **Application, Controller, Service, and Entity/Model layers** to achieve clear separation of concerns.
+
+## Objective
+
+Improve scalability, maintainability, and testability by separating **presentation, business logic, and data representation**.
+
+## Architecture Layers
+
+- **Application Layer** – `QuantityMeasurementApp` initializes components and starts the application.
+- **Controller Layer** – `QuantityMeasurementController` handles requests and delegates operations.
+- **Service Layer** – `QuantityMeasurementServiceImpl` implements business logic for comparison, conversion, and arithmetic.
+- **Entity/Model Layer** – `QuantityDTO`, `QuantityModel`, and `QuantityMeasurementEntity` represent data structures.
+
+## Key Components
+
+- `IQuantityMeasurementService` – Service contract
+- `IQuantityMeasurementRepository` – Data access contract
+- `QuantityMeasurementCacheRepository` – Singleton in-memory repository
+- `QuantityMeasurementException` – Custom exception for measurement errors
+
+## Key Benefits
+
+- Separation of Concerns (SoC)
+- Improved testability and maintainability
+- Reusable service layer for CLI, REST, or GUI
+- Dependency Injection ready
+- Supports design patterns: **Factory, Singleton, Facade**
+
+## Postconditions
+
+- All UC1–UC14 functionality preserved
+- Business logic isolated from UI
+- Layered architecture ready for **REST APIs or Spring Boot integration**
+
+🔗 _Code Link:_
+👉 [UC15 – N-Tier Architecture Refactoring](https://github.com/akshaykumarsingh7323/QuantityMeasurementApp/tree/feature/UC15-N-Tier/src)
+
+---
+
+## 🗄️ UC16 – Database Integration with JDBC
+
+## Description
+
+UC16 enhances the Quantity Measurement Application by integrating a **relational database using JDBC** for persistent storage.  
+The application now stores measurement operations in a database instead of relying only on in-memory caching.
+
+## Objective
+
+Enable **long-term persistence, audit history, and scalable storage** using a database repository while maintaining the N-Tier architecture from UC15.
+
+## Key Enhancements
+
+- Introduced `QuantityMeasurementDatabaseRepository`
+- JDBC integration with **H2 database (development/testing)**
+- Maven project structure and dependency management
+- Connection pooling for efficient database access
+- Parameterized SQL queries for **SQL injection protection**
+- Database schema initialization using `schema.sql`
+
+## Architecture Integration
+
+- **Controller Layer** → Handles requests
+- **Service Layer** → Business logic
+- **Repository Layer** → JDBC database operations
+- **Entity Layer** → Data models and DTOs
+
+## Key Components
+
+- `ApplicationConfig` – Loads database configuration
+- `ConnectionPool` – Manages database connections
+- `DatabaseException` – Handles database errors
+- `QuantityMeasurementDatabaseRepository` – JDBC persistence implementation
+
+## Features
+
+- Store and retrieve quantity measurement history
+- Query measurements by operation or measurement type
+- Support both **cache and database repositories via dependency injection**
+- Logging using SLF4J
+- Maven build and test automation
+
+## Postconditions
+
+- All UC1–UC15 functionality preserved
+- Measurements persisted in database
+- Connection pooling and transaction management implemented
+- System ready for **enterprise-level persistence and analytics**
+
+🔗 _Code Link:_
+👉 [UC16 – Database Integration with JDBC](https://github.com/akshaykumarsingh7323/QuantityMeasurementApp/tree/feature/UC16-Database-Integration)
+
+---
