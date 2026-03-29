@@ -3,6 +3,7 @@ package com.app.quantitymeasurement.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.app.quantitymeasurement.model.QuantityDTO;
 import com.app.quantitymeasurement.model.QuantityMeasurementDTO;
@@ -16,14 +17,17 @@ import com.app.quantitymeasurement.unit.WeightUnit;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Implementation of IQuantityMeasurementService.
  * Handles the logic for unit conversions, comparisons, and arithmetic operations
  * while persisting each operation to the database via QuantityMeasurementRepository.
  */
+@Service
+@RequiredArgsConstructor
+@Transactional
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
+
+    private static final double COMPARISON_TOLERANCE = 0.0001;
 
     private final QuantityMeasurementRepository repository;
 
@@ -246,7 +250,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         double val1 = u1.convertToBaseUnit(q1.getValue());
         double val2 = u2.convertToBaseUnit(q2.getValue());
         
-        return Math.abs(val1 - val2) < 0.0001;
+        return Math.abs(val1 - val2) < COMPARISON_TOLERANCE;
     }
 
     private double convertValue(QuantityDTO q, String targetUnitStr) {

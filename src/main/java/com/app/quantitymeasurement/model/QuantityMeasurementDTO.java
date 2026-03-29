@@ -102,12 +102,4 @@ public class QuantityMeasurementDTO {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * List<DTO> → List<Entity>
-     */
-    public static List<QuantityMeasurementEntity> toEntityList(List<QuantityMeasurementDTO> dtos) {
-        return dtos.stream()
-                .map(QuantityMeasurementDTO::toEntity)
-                .collect(Collectors.toList());
-    }
 }

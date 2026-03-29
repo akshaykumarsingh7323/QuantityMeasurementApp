@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a record of a quantity measurement operation.
+ * Persists details of the inputs, operation, and results in the database
+ * for auditing and history tracking.
+ */
 @Entity
 @Table(
     name = "quantity_measurements",
@@ -19,11 +24,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * JPA Entity representing a record of a quantity measurement operation.
- * Persists details of the inputs, operation, and results in the database
- * for auditing and history tracking.
- */
 public class QuantityMeasurementEntity {
 
     @Id
