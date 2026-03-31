@@ -1,4 +1,4 @@
-package com.app.quantitymeasurement.model;
+package com.app.quantitymeasurement.enums;
 
 /**
  * Enum representing the authentication provider for a User.

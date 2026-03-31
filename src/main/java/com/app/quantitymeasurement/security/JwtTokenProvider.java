@@ -1,23 +1,30 @@
 package com.app.quantitymeasurement.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 /**
  * Utility component for creating and validating JSON Web Tokens (JWTs).
  *
  * <p>Tokens are signed using HMAC-SHA512 with a secret key defined in
  * {@code application.properties}. The token subject is the authenticated user's
- * database ID, which is used to look up the user on subsequent requests.</p>
+ * database ID. A unique JTI (JWT ID) is embedded to support logout/blacklisting.</p>
  */
 @Component
 public class JwtTokenProvider {
@@ -38,12 +45,27 @@ public class JwtTokenProvider {
      */
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        return buildToken(userPrincipal.getId());
+    }
 
-        Date expiryDate = new Date(System.currentTimeMillis() + tokenExpirationMsec);
+    /**
+     * Generates a JWT directly from a user ID (used after password reset / refresh).
+     *
+     * @param userId the user's database ID
+     * @return a compact, URL-safe JWT string
+     */
+    public String generateTokenFromUserId(Long userId) {
+        return buildToken(userId);
+    }
+
+    private String buildToken(Long userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + tokenExpirationMsec);
 
         return Jwts.builder()
-                .subject(Long.toString(userPrincipal.getId()))
-                .issuedAt(new Date())
+                .subject(Long.toString(userId))
+                .id(UUID.randomUUID().toString())   // JTI for blacklisting
+                .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
@@ -63,6 +85,36 @@ public class JwtTokenProvider {
                 .getPayload();
 
         return Long.parseLong(claims.getSubject());
+    }
+
+    /**
+     * Extracts the JTI (JWT ID) from a token, used for blacklisting on logout.
+     *
+     * @param token the JWT string
+     * @return the JTI string
+     */
+    public String getJtiFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.getId();
+    }
+
+    /**
+     * Returns the remaining validity duration (ms) of the token.
+     *
+     * @param token the JWT string
+     * @return milliseconds until expiry
+     */
+    public long getTokenExpirationMs(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.getExpiration().getTime() - System.currentTimeMillis();
     }
 
     /**

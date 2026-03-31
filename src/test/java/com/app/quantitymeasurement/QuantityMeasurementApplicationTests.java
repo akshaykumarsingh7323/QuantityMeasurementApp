@@ -1,13 +1,13 @@
 package com.app.quantitymeasurement;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -17,14 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.app.quantitymeasurement.dto.QuantityDTO;
+import com.app.quantitymeasurement.dto.QuantityInputDTO;
+import com.app.quantitymeasurement.entity.User;
+import com.app.quantitymeasurement.enums.AuthProvider;
+import com.app.quantitymeasurement.repository.UserRepository;
+import com.app.quantitymeasurement.security.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.app.quantitymeasurement.model.QuantityDTO;
-import com.app.quantitymeasurement.model.QuantityInputDTO;
 
 /**
  * Integration tests for the Quantity Measurement Application.
@@ -34,7 +37,6 @@ import com.app.quantitymeasurement.model.QuantityInputDTO;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-@WithMockUser(username = "testuser", roles = {"USER"}) // Provide a default mock user for all tests
 public class QuantityMeasurementApplicationTests {
 
     @Autowired
@@ -43,10 +45,32 @@ public class QuantityMeasurementApplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    private UserPrincipal testUserPrincipal;
+
+    @BeforeEach
+    void setupUser() {
+        if (userRepository.findByEmail("test@example.com").isEmpty()) {
+            User user = User.builder()
+                    .email("test@example.com")
+                    .firstName("Test")
+                    .lastName("User")
+                    .provider(AuthProvider.local)
+                    .emailVerified(false)
+                    .build();
+            user = userRepository.save(user);
+            testUserPrincipal = new UserPrincipal(user);
+        } else {
+            testUserPrincipal = new UserPrincipal(userRepository.findByEmail("test@example.com").get());
+        }
+    }
+
     // ---------------- Helper Methods ----------------
 
     private String baseUrl() {
-        return "/api/v1/quantities";
+        return "/api/user/quantities";
     }
 
     private QuantityInputDTO input(
@@ -86,7 +110,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_FootEqualsInches() throws Exception {
         QuantityInputDTO body = input(1.0, "FEET", "LengthUnit", 12.0, "INCHES", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/compare")
+        mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -99,7 +123,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_FootNotEqualInch() throws Exception {
         QuantityInputDTO body = input(1.0, "FEET", "LengthUnit", 1.0, "INCHES", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/compare")
+        mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -112,7 +136,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_GallonEqualsLitres() throws Exception {
         QuantityInputDTO body = input(1.0, "GALLON", "VolumeUnit", 3.785, "LITER", "VolumeUnit");
         
-        mockMvc.perform(post(baseUrl() + "/compare")
+        mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -125,7 +149,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_FahrenheitEqualsCelsius() throws Exception {
         QuantityInputDTO body = input(212.0, "FAHRENHEIT", "TemperatureUnit", 100.0, "CELSIUS", "TemperatureUnit");
         
-        mockMvc.perform(post(baseUrl() + "/compare")
+        mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -138,7 +162,7 @@ public class QuantityMeasurementApplicationTests {
     void testConvert_CelsiusToFahrenheit() throws Exception {
         QuantityInputDTO body = input(100.0, "CELSIUS", "TemperatureUnit", 0.0, "FAHRENHEIT", "TemperatureUnit");
         
-        mockMvc.perform(post(baseUrl() + "/convert")
+        mockMvc.perform(post(baseUrl() + "/convert").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -151,7 +175,7 @@ public class QuantityMeasurementApplicationTests {
     void testAdd_GallonAndLitres() throws Exception {
         QuantityInputDTO body = input(1.0, "GALLON", "VolumeUnit", 3.785, "LITER", "VolumeUnit");
         
-        mockMvc.perform(post(baseUrl() + "/add")
+        mockMvc.perform(post(baseUrl() + "/add").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -164,7 +188,7 @@ public class QuantityMeasurementApplicationTests {
     void testAddWithTargetUnit_FootAndInchesToInches() throws Exception {
         QuantityInputDTO body = inputWithTarget(1.0, "FEET", "LengthUnit", 12.0, "INCHES", "LengthUnit", 0.0, "INCHES", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/add-with-target-unit")
+        mockMvc.perform(post(baseUrl() + "/add-with-target-unit").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -177,7 +201,7 @@ public class QuantityMeasurementApplicationTests {
     void testSubtract_FeetMinusInches() throws Exception {
         QuantityInputDTO body = input(2.0, "FEET", "LengthUnit", 12.0, "INCHES", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/subtract")
+        mockMvc.perform(post(baseUrl() + "/subtract").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -190,7 +214,7 @@ public class QuantityMeasurementApplicationTests {
     void testSubtractWithTargetUnit() throws Exception {
         QuantityInputDTO body = inputWithTarget(2.0, "FEET", "LengthUnit", 12.0, "INCHES", "LengthUnit", 0.0, "INCHES", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/subtract-with-target-unit")
+        mockMvc.perform(post(baseUrl() + "/subtract-with-target-unit").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -203,7 +227,7 @@ public class QuantityMeasurementApplicationTests {
     void testDivide_YardByFoot() throws Exception {
         QuantityInputDTO body = input(1.0, "YARDS", "LengthUnit", 1.0, "FEET", "LengthUnit");
         
-        mockMvc.perform(post(baseUrl() + "/divide")
+        mockMvc.perform(post(baseUrl() + "/divide").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
@@ -214,7 +238,7 @@ public class QuantityMeasurementApplicationTests {
     @Order(12)
     @DisplayName("GET /history/operation/CONVERT - returns list of CONVERT operations")
     void testGetHistoryByOperation_Convert() throws Exception {
-        mockMvc.perform(get(baseUrl() + "/history/operation/CONVERT"))
+        mockMvc.perform(get(baseUrl() + "/history/operation/CONVERT").with(user(testUserPrincipal)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isNotEmpty());
@@ -224,7 +248,7 @@ public class QuantityMeasurementApplicationTests {
     @Order(13)
     @DisplayName("GET /history/type/TemperatureUnit - returns history for TemperatureUnit measurements")
     void testGetHistoryByType_Temperature() throws Exception {
-        mockMvc.perform(get(baseUrl() + "/history/type/TemperatureUnit"))
+        mockMvc.perform(get(baseUrl() + "/history/type/TemperatureUnit").with(user(testUserPrincipal)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isNotEmpty());
@@ -234,7 +258,7 @@ public class QuantityMeasurementApplicationTests {
     @Order(14)
     @DisplayName("GET /count/DIVIDE - returns count of DIVIDE operations > 0")
     void testGetOperationCount_Divide() throws Exception {
-        MvcResult result = mockMvc.perform(get(baseUrl() + "/count/DIVIDE"))
+        MvcResult result = mockMvc.perform(get(baseUrl() + "/count/DIVIDE").with(user(testUserPrincipal)))
                 .andExpect(status().isOk())
                 .andReturn();
         
@@ -248,8 +272,7 @@ public class QuantityMeasurementApplicationTests {
     void testDivide_YardByFeet_Error() throws Exception {
         QuantityInputDTO body = input(1.0, "YARDS", "LengthUnit", 0.0, "FEET", "LengthUnit");
 
-        // The application's error handling likely returns a string msg for INTERNAL_SERVER_ERROR or BAD_REQUEST
-        MvcResult result = mockMvc.perform(post(baseUrl() + "/divide")
+        MvcResult result = mockMvc.perform(post(baseUrl() + "/divide").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andReturn();
@@ -257,7 +280,7 @@ public class QuantityMeasurementApplicationTests {
         assertThat(result.getResponse().getStatus()).isEqualTo(422);
         assertThat(result.getResponse().getContentAsString()).contains("Divide by zero");
 
-        mockMvc.perform(get(baseUrl() + "/history/errored"))
+        mockMvc.perform(get(baseUrl() + "/history/errored").with(user(testUserPrincipal)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -268,7 +291,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_FootEqualsInches_UnitValidationFails() throws Exception {
         QuantityInputDTO body = input(1.0, "FOOT", "LengthUnit", 12.0, "INCHES", "LengthUnit");
 
-        MvcResult result = mockMvc.perform(post(baseUrl() + "/compare")
+        MvcResult result = mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andReturn();
@@ -283,7 +306,7 @@ public class QuantityMeasurementApplicationTests {
     void testCompare_FootEqualsInches_TypeValidationFails() throws Exception {
         QuantityInputDTO body = input(1.0, "FEET", "InvalidType", 12.0, "INCHES", "LengthUnit");
 
-        MvcResult result = mockMvc.perform(post(baseUrl() + "/compare")
+        MvcResult result = mockMvc.perform(post(baseUrl() + "/compare").with(user(testUserPrincipal))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body)))
                 .andReturn();

@@ -1,13 +1,14 @@
 package com.app.quantitymeasurement.security;
 
-import com.app.quantitymeasurement.model.User;
-import com.app.quantitymeasurement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.app.quantitymeasurement.entity.User;
+import com.app.quantitymeasurement.repository.UserRepository;
 
 /**
  * Implementation of {@link UserDetailsService} that loads a {@link User} by ID or email.

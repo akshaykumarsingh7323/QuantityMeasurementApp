@@ -1,15 +1,15 @@
 package com.app.quantitymeasurement.security;
 
-import com.app.quantitymeasurement.model.User;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.app.quantitymeasurement.entity.User;
 
 /**
  * Implementation of both {@link UserDetails} and {@link OAuth2User} to represent
@@ -26,6 +26,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     /**
      * Constructs a UserPrincipal from a User entity.
+     * All users are granted the ROLE_USER authority (no RBAC).
      *
      * @param user the authenticated User entity from the database
      */
@@ -33,9 +34,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-        List<GrantedAuthority> authorityList =
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-        this.authorities = authorityList;
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     /**

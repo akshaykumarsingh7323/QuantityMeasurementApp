@@ -1,9 +1,7 @@
 package com.app.quantitymeasurement.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +12,19 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import com.app.quantitymeasurement.service.TokenBlacklistService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * JWT Authentication Filter — executed once per request.
  *
  * <p>Extracts the JWT from the {@code Authorization: Bearer <token>} header,
- * validates it, and if valid, loads the corresponding user into the
- * {@link SecurityContextHolder} for the duration of the request.</p>
+ * validates it, checks if it's been blacklisted (logout), and if valid,
+ * loads the corresponding user into the {@link SecurityContextHolder}.</p>
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -33,9 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
     /**
      * Intercepts each request, parses the Authorization header, and
-     * authenticates the user if a valid JWT is present.
+     * authenticates the user if a valid, non-blacklisted JWT is present.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -45,9 +51,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                Long userId = tokenProvider.getUserIdFromToken(jwt);
+                // Check if the token has been blacklisted (logged-out)
+                String jti = tokenProvider.getJtiFromToken(jwt);
+                if (tokenBlacklistService.isBlacklisted(jti)) {
+                    logger.warn("Attempted use of blacklisted token. JTI: {}", jti);
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
+                Long userId = tokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());

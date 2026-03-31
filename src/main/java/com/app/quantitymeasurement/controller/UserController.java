@@ -1,15 +1,19 @@
 package com.app.quantitymeasurement.controller;
 
-import com.app.quantitymeasurement.model.User;
-import com.app.quantitymeasurement.repository.UserRepository;
-import com.app.quantitymeasurement.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.app.quantitymeasurement.entity.User;
+import com.app.quantitymeasurement.exception.ResourceNotFoundException;
+import com.app.quantitymeasurement.repository.UserRepository;
+import com.app.quantitymeasurement.security.UserPrincipal;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST Controller for user profile management.
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/user")
+@Tag(name = "User Profile", description = "APIs for managing the authenticated user's profile")
 public class UserController {
 
     @Autowired
@@ -34,10 +39,10 @@ public class UserController {
      * @return a {@link ResponseEntity} with the user's details
      */
     @GetMapping("/me")
-    @PreAuthorize("hasRole('USER')")
+    @Operation(summary = "Get the current authenticated user's profile")
     public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal UserPrincipal currentUser) {
         User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(() -> new com.app.quantitymeasurement.exception.QuantityMeasurementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUser.getId()));
         return ResponseEntity.ok(user);
     }
 }

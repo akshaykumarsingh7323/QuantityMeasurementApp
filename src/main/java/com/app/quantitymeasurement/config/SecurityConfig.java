@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,7 +34,6 @@ import com.app.quantitymeasurement.security.OAuth2AuthenticationSuccessHandler;
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Autowired
@@ -56,7 +54,7 @@ public class SecurityConfig {
     /**
      * Configures the main Security Filter Chain.
      *
-     * <p>Public endpoints (H2 console, Swagger, OAuth2 redirects) are allowed without
+     * <p>Public endpoints (Swagger, OAuth2 redirects, auth APIs) are allowed without
      * a token. All other endpoints require a valid JWT.</p>
      *
      * @param http the HttpSecurity builder
@@ -82,7 +80,7 @@ public class SecurityConfig {
                 headers.frameOptions(frame -> frame.disable())
             )
 
-            // Authorization rules
+            // Authorization rules — no RBAC, all authenticated users have the same access
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints — no token required
                 .requestMatchers(
@@ -93,8 +91,7 @@ public class SecurityConfig {
                     "/actuator/**",
                     "/oauth2/**",
                     "/login/**",
-                    "/api/auth/**",
-                    "/api/v1/quantities/**"  // Temporarily allow quantity endpoints for testing
+                    "/api/auth/**"
                 ).permitAll()
                 // All other requests need a valid JWT
                 .anyRequest().authenticated()

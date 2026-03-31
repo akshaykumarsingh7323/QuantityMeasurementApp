@@ -1,8 +1,8 @@
 package com.app.quantitymeasurement.security;
 
-import com.app.quantitymeasurement.model.AuthProvider;
-import com.app.quantitymeasurement.model.User;
-import com.app.quantitymeasurement.repository.UserRepository;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -12,8 +12,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Map;
-import java.util.Optional;
+import com.app.quantitymeasurement.entity.User;
+import com.app.quantitymeasurement.enums.AuthProvider;
+import com.app.quantitymeasurement.repository.UserRepository;
 
 /**
  * Custom OAuth2 user service that integrates with Google's OAuth2 provider.
@@ -79,10 +80,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private User registerNewUser(OAuth2UserRequest request,
                                  Map<String, Object> attributes,
                                  String email) {
+        String fullName = (String) attributes.get("name");
+        String[] nameParts = fullName != null ? fullName.split(" ", 2) : new String[]{"User", ""};
+        String firstName = nameParts[0];
+        String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
         User user = User.builder()
                 .provider(AuthProvider.google)
                 .providerId((String) attributes.get("sub"))
-                .name((String) attributes.get("name"))
+                .firstName(firstName)
+                .lastName(lastName)
                 .email(email)
                 .imageUrl((String) attributes.get("picture"))
                 .emailVerified(Boolean.TRUE.equals(attributes.get("email_verified")))
@@ -92,7 +99,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     /** Updates a returning user's profile (name, picture) from OAuth2 attributes. */
     private User updateExistingUser(User existingUser, Map<String, Object> attributes) {
-        existingUser.setName((String) attributes.get("name"));
+        String fullName = (String) attributes.get("name");
+        String[] nameParts = fullName != null ? fullName.split(" ", 2) : new String[]{"User", ""};
+        existingUser.setFirstName(nameParts[0]);
+        existingUser.setLastName(nameParts.length > 1 ? nameParts[1] : "");
         existingUser.setImageUrl((String) attributes.get("picture"));
         return userRepository.save(existingUser);
     }

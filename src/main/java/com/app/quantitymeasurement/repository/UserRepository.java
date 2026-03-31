@@ -1,10 +1,11 @@
 package com.app.quantitymeasurement.repository;
 
-import com.app.quantitymeasurement.model.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.app.quantitymeasurement.entity.User;
 
 /**
  * Spring Data JPA repository for the {@link User} entity.
