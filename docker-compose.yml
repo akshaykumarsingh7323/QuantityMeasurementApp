@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:mysql://db:3306/quantitymeasurement_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - DB_USERNAME=root
+      - DB_PASSWORD=rootpassword
+      - REDIS_HOST=redis
+      - APP_OAUTH2_REDIRECT_URI=http://localhost:3000/oauth2/redirect
+      - APP_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - APP_AUTH_TOKEN_SECRET=${APP_AUTH_TOKEN_SECRET}
+    depends_on:
+      - db
+      - redis
+    networks:
+      - quantity-net
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=quantitymeasurement_db
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    ports:
+      - "3307:3306" # Mapped to 3307 to avoid conflict with local mysql if any
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - quantity-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - quantity-net
+
+networks:
+  quantity-net:
+    driver: bridge
+
+volumes:
+  mysql_data:

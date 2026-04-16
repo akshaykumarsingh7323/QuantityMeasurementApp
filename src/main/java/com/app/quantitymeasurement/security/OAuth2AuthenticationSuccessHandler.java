@@ -32,7 +32,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private JwtTokenProvider tokenProvider;
 
     /** The frontend URL to redirect to with the generated token. */
-    @Value("${app.oauth2.redirectUri:http://localhost:3000/oauth2/redirect}")
+    @Value("${app.oauth2.redirectUri}")
     private String redirectUri;
 
     /**

@@ -1,8 +1,11 @@
 package com.app.quantitymeasurement.config;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -135,6 +138,9 @@ public class SecurityConfig {
         return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
     }
 
+    @Value("${app.cors.allowedOrigins:http://localhost:3000,http://localhost:4200}")
+    private String allowedOrigins;
+
     /**
      * CORS configuration allowing the frontend origin and common HTTP methods.
      *
@@ -144,12 +150,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+
         // Allow frontend origins
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:4200",
-                "http://localhost:8080"
-        ));
+        configuration.setAllowedOrigins(origins);
 
         // Allow HTTP methods
         configuration.setAllowedMethods(Arrays.asList(
@@ -159,8 +165,9 @@ public class SecurityConfig {
         // Allow specific headers
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
 
-        // Allow credentials (auth headers, cookies)
-        configuration.setAllowCredentials(true);
+        // Allow credentials (auth headers, cookies) only if origins are NOT an inclusive wildcard "*"
+        boolean allowCredentials = origins.stream().noneMatch(o -> o.equals("*"));
+        configuration.setAllowCredentials(allowCredentials);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

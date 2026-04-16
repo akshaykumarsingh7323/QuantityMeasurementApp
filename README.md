@@ -1012,3 +1012,40 @@ spring:
 👉 [UC18 – Google Authentication and User Management](https://github.com/akshaykumarsingh7323/QuantityMeasurementApp/tree/feature/UC18-Google-Authnetication/src)
 
 ---
+
+## ☁️ Production Deployment (EC2 + Docker)
+
+The application is now production-ready for deployment using Docker on AWS EC2. All localhost assumptions have been removed and replaced with environment-driven configurations.
+
+### Required Environment Variables
+
+When running in production (`SPRING_PROFILES_ACTIVE=prod`), the following environment variables MUST be set:
+
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `SPRING_PROFILES_ACTIVE` | Set to `prod` for production behavior | `prod` |
+| `APP_OAUTH2_REDIRECT_URI` | Frontend URL for OAuth2 redirect | `https://your-frontend-app.com/oauth2/redirect` |
+| `APP_CORS_ALLOWED_ORIGINS` | Comma-separated allowed CORS origins | `https://app.com,https://api.app.com` |
+| `DB_URL` | MySQL JDBC URL | `jdbc:mysql://db-host:3306/db_name` |
+| `DB_USERNAME` | Database username | `admin` |
+| `DB_PASSWORD` | Database password | `secret_password` |
+| `REDIS_HOST` | Redis server hostname | `redis-cache` |
+| `REDIS_PORT` | Redis server port (defaults to 6379) | `6379` |
+| `APP_AUTH_TOKEN_SECRET` | JWT Signing Secret (Base64) | `openssl rand -base64 64` |
+
+### Docker Deployment
+
+**1. Build the Docker Image:**
+```bash
+docker build -t quantity-measurement-app .
+```
+
+**2. Run using Docker Compose:**
+```bash
+docker-compose up -d
+```
+
+### Startup Validation
+The application includes a `StartupConfigValidator` that checks for mandatory production settings. If any required environment variable is missing in the `prod` profile, the application will fail to start with a clear error message.
+
+---
