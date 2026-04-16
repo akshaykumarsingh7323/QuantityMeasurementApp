@@ -6,7 +6,7 @@ spring:
         name: auth-service
 
     datasource:
-        url: jdbc:mysql://localhost:3306/quantitymeasurement_auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+        url: ${DB_URL_AUTH:jdbc:mysql://db:3306/quantitymeasurement_auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: ${DB_USERNAME:root}
         password: ${DB_PASSWORD:Akshay@2004}
@@ -52,11 +52,11 @@ spring:
     boot:
         admin:
             client:
-                url: http://localhost:9090
+                url: ${ADMIN_SERVER_URL:http://admin-server:9090}
                 instance:
                     prefer-ip: true
-                username: admin
-                password: "admin123"
+                username: ${ADMIN_USERNAME:admin}
+                password: ${ADMIN_PASSWORD:admin123}
 
 server:
     port: ${SERVER_PORT:8083}
@@ -65,11 +65,12 @@ server:
         remoteip:
             remote-ip-header: x-forwarded-for
             protocol-header: x-forwarded-proto
+            proxies-header: x-forwarded-by
 
 eureka:
     client:
         service-url:
-            defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+            defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
         fetch-registry: true
         register-with-eureka: true
 
